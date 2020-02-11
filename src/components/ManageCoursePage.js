@@ -6,7 +6,8 @@ import * as courseActions from "../actions/courseActions";
 
 const ManageCoursePage = props => {
   const [errors, setErrors] = useState({});
-  const [course, setCourses] = useState({
+  const [courses, setCourses] = useState(courseStore.getCourses());
+  const [course, setCourse] = useState({
     id: null,
     slug: "",
     title: "",
@@ -15,14 +16,24 @@ const ManageCoursePage = props => {
   });
 
   useEffect(() => {
+    courseStore.addChangeListener(onChange);
     const slug = props.match.params.slug;
-    if (slug) {
-      setCourses(courseStore.getCourseBySlug(slug));
+    if (courses.length === 0) {
+      courseActions.loadCourses();
+    } else if (slug) {
+      const course = courseStore.getCourseBySlug(slug);
+      if (course) setCourse(course);
+      else return props.history.push("/NotFound");
     }
-  }, [props.match.params.slug]);
+    return () => courseStore.removeChangeListener(onChange);
+  }, [courses.length, props.match.params.slug, props.history]);
+
+  function onChange() {
+    setCourses(courseStore.getCourses());
+  }
 
   function handleChange({ target }) {
-    setCourses({
+    setCourse({
       ...course,
       [target.name]: target.value
     });
@@ -49,7 +60,7 @@ const ManageCoursePage = props => {
     });
   }
 
-  return (
+  const form = (
     <>
       <h2>Manage Course</h2>
       <CourseForm
@@ -60,6 +71,8 @@ const ManageCoursePage = props => {
       ></CourseForm>
     </>
   );
+
+  return form;
 };
 
 export default ManageCoursePage;

@@ -37,7 +37,7 @@ SelectInput.propTypes = {
   label: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
+  value: PropTypes.number,
   error: PropTypes.string
 };
 
